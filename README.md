@@ -1,4 +1,5 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Landing Page
+![case-cobra](https://github.com/Sahil-kachhap/custom-phone-case-store/assets/54017876/7dfad48d-c917-415c-ab85-2bb4d64245b0)
 
 ## Getting Started
 
