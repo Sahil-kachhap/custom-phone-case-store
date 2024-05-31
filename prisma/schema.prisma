@@ -14,8 +14,9 @@ datasource db {
 }
 
 model configuration {
-  id String @id @default(cuid())
-  width Int
-  height Int
+  id              String  @id @default(cuid())
+  width           Int
+  height          Int
+  imageUrl        String
   croppedImageUrl String?
 }
