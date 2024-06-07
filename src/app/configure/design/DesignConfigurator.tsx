@@ -31,6 +31,9 @@ import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 import { BASE_PRICE } from "@/config/product";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useToast } from "@/components/ui/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { SaveConfigArgs, saveConfig } from "./action";
+import { useRouter } from "next/navigation";
 
 interface ConfigProps {
   configId: string;
@@ -43,7 +46,26 @@ const DesignConfigurator = ({
   imageUrl,
   imageDimension,
 }: ConfigProps) => {
-  const {toast} = useToast();
+  const { toast } = useToast();
+  const router = useRouter();
+
+  // using react query for saving cropped image to db
+  const { mutate: saveAndStoreConfig } = useMutation({
+    mutationKey: ["save-config"],
+    mutationFn: async (args: SaveConfigArgs) => {
+      await Promise.all([saveConfiguration(), saveConfig(args)]);
+    },
+    onError: () => {
+      toast({
+        title: "Something went wrong",
+        description: "There was an error on our end. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onSuccess: () => {
+      router.push(`/configure/preview?id=${configId}`);
+    },
+  });
 
   const [options, setOptions] = useState<{
     color: (typeof COLORS)[number];
@@ -73,7 +95,7 @@ const DesignConfigurator = ({
   const phoneCaseRef = useRef<HTMLDivElement>(null);
   const phoneCaseParentContainerRef = useRef<HTMLDivElement>(null);
 
-  const {startUpload} = useUploadThing("imageUploader");
+  const { startUpload } = useUploadThing("imageUploader");
 
   async function saveConfiguration() {
     try {
@@ -121,15 +143,16 @@ const DesignConfigurator = ({
       const base64Data = base64.split(",")[1];
 
       const blob = base64ToBlob(base64Data, "image/png");
-      const file = new File([blob], "filename.png", {type: "image/png"});
+      const file = new File([blob], "filename.png", { type: "image/png" });
 
-      await startUpload([file], {configId})
+      await startUpload([file], { configId });
     } catch (error) {
       toast({
         title: "Something went wrong",
-        description: "There was a problem saving your config, Please try again.",
-        variant: "destructive"
-      })
+        description:
+          "There was a problem saving your config, Please try again.",
+        variant: "destructive",
+      });
     }
   }
 
@@ -141,7 +164,7 @@ const DesignConfigurator = ({
     }
 
     const byteArray = new Uint8Array(byteNumbers);
-    return new Blob([byteArray], {type: mimeType});
+    return new Blob([byteArray], { type: mimeType });
   }
 
   return (
@@ -383,7 +406,19 @@ const DesignConfigurator = ({
                       100
                   )}
                 </p>
-                <Button onClick={saveConfiguration} size="sm" className="w-full">
+                <Button
+                  onClick={() =>
+                    saveAndStoreConfig({
+                      configId,
+                      color: options.color.value,
+                      material: options.material.value,
+                      finish: options.finish.value,
+                      model: options.model.value
+                    })
+                  }
+                  size="sm"
+                  className="w-full"
+                >
                   Continue
                   <ArrowRight className="h-4 w-4 ml-1.5 inline" />
                 </Button>
