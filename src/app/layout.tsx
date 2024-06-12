@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import Providers from "@/components/Provider";
+import {ClerkProvider} from "@clerk/nextjs";
 
 const poppins = Poppins({ subsets: ['latin'], weight: "400" });
 
@@ -19,6 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ClerkProvider>
     <html lang="en">
       <body className={poppins.className}>
         <Navbar />
@@ -31,5 +33,6 @@ export default function RootLayout({
         <Toaster />
       </body>
     </html>
+    </ClerkProvider>
   );
 }

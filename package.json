@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^5.1.5",
     "@headlessui/react": "^2.0.4",
     "@prisma/client": "^5.14.0",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
@@ -33,6 +34,7 @@
     "react-dropzone": "^14.2.3",
     "react-rnd": "^10.4.11",
     "sharp": "^0.32.6",
+    "stripe": "^15.10.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^6.12.0",
