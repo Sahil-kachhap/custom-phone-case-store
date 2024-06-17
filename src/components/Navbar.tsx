@@ -2,11 +2,16 @@ import Link from "next/link";
 import MaxWidthWrapper from "./MaxWidthWrapper";
 import { buttonVariants } from "./ui/button";
 import { ArrowRight } from "lucide-react";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
-const Navbar = () => {
-  const user = false;
-  const isAdmin = true;
+const Navbar = async () => {
+  const user = await currentUser();
+
+  const isAdmin = user?.primaryEmailAddress?.emailAddress! === process.env.ADMIN_EMAIL;
+  console.log(`IsAdmin: ${user?.emailAddresses}`);
+
+
   return (
     <nav className="sticky h-14 z-[100] inset-x-0 top-0 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all">
       <MaxWidthWrapper>
@@ -25,7 +30,7 @@ const Navbar = () => {
                 </Link>
                 {isAdmin ? (
                   <Link
-                    href={"/api/auth/logout"}
+                    href={"/dashboard"}
                     className={buttonVariants({ size: "sm", variant: "ghost" })}
                   >
                     Dashboard
