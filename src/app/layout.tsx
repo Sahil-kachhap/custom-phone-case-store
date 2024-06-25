@@ -10,8 +10,9 @@ import {ClerkProvider} from "@clerk/nextjs";
 const poppins = Poppins({ subsets: ['latin'], weight: "400" });
 
 export const metadata: Metadata = {
-  title: "CaseCanvas",
-  description: "Get your custom phone case",
+  title: "CaseCanvas - custom high-quality phone cases",
+  description: "Get your custom high-quality phone cases in seconds",
+  
 };
 
 export default function RootLayout({
