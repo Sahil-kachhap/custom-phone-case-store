@@ -1,11 +1,9 @@
 "use client";
-import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import NextImage from "next/image";
-import PhoneTemplate from "../../../../public/phone-template-white-edges.png";
+import PhoneTemplate from "../../../../public/phone-template.png";
 import { cn, formatPrice } from "@/lib/utils";
 import { Rnd } from "react-rnd";
 import HandleComponent from "@/components/HandleComponent";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 import {
   Description,
   Radio,
@@ -24,16 +22,18 @@ import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuContent
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Check, ChevronsUpDown } from "lucide-react";
-import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 import { BASE_PRICE } from "@/config/product";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useToast } from "@/components/ui/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { SaveConfigArgs, saveConfig } from "./action";
 import { useRouter } from "next/navigation";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface ConfigProps {
   configId: string;
@@ -50,7 +50,7 @@ const DesignConfigurator = ({
   const router = useRouter();
 
   // using react query for saving cropped image to db
-  const { mutate: saveAndStoreConfig } = useMutation({
+  const { mutate: saveAndStoreConfig, isPending } = useMutation({
     mutationKey: ["save-config"],
     mutationFn: async (args: SaveConfigArgs) => {
       await Promise.all([saveConfiguration(), saveConfig(args)]);
@@ -299,7 +299,7 @@ const DesignConfigurator = ({
                         <ChevronsUpDown className="h-4 w-4 ml-4 shrink-0 opacity-50" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
+                    <DropdownMenuContent className="w-72">
                       {MODELS.options.map((model) => (
                         <DropdownMenuItem
                           key={model.label}
@@ -395,7 +395,7 @@ const DesignConfigurator = ({
         </ScrollArea>
 
         <div className="h-16 w-full bg-white px-8">
-          <div className="w-full h-px bg-zinc-200">
+          <div className="w-full h-px bg-zinc-200" />
             <div className="flex justify-end items-center w-full h-full">
               <div className="flex items-center w-full gap-6">
                 <p className="font-medium whitespace-nowrap">
@@ -407,6 +407,9 @@ const DesignConfigurator = ({
                   )}
                 </p>
                 <Button
+                  isLoading={isPending}
+                  disabled={isPending}
+                  loadingText="Saving"
                   onClick={() =>
                     saveAndStoreConfig({
                       configId,
@@ -422,13 +425,12 @@ const DesignConfigurator = ({
                   Continue
                   <ArrowRight className="h-4 w-4 ml-1.5 inline" />
                 </Button>
-              </div>
+              </div>  
             </div>
-          </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default DesignConfigurator;
