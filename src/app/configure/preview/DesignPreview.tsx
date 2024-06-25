@@ -9,8 +9,20 @@ import { cn, formatPrice } from "@/lib/utils";
 import { ArrowRight, Check } from "lucide-react";
 import { BASE_PRICE, PRODUCT_PRICES } from "@/config/product";
 import { Button } from "@/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { createCheckoutSession } from "./actions";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const DesignPreview = ({ configuration }: { configuration: configuration }) => {
+  const router = useRouter();
+  const { toast } = useToast();
   const [showConfetti, setConfetti] = useState(false);
 
   useEffect(() => setConfetti(true), []);
@@ -25,10 +37,29 @@ const DesignPreview = ({ configuration }: { configuration: configuration }) => {
   )!;
 
   let totalPrice = BASE_PRICE;
-  if(material === "polycarbonate") totalPrice += PRODUCT_PRICES.material.polycarbonate
-  
-  if(finish === "textured") totalPrice += PRODUCT_PRICES.finish.textured 
+  if (material === "polycarbonate")
+    totalPrice += PRODUCT_PRICES.material.polycarbonate;
 
+  if (finish === "textured") totalPrice += PRODUCT_PRICES.finish.textured;
+
+  const { mutate: createPaymentSession } = useMutation({
+    mutationKey: ["get-checkout-session"],
+    mutationFn: createCheckoutSession,
+    onSuccess: ({ url }) => {
+      if (url) {
+        router.push(url);
+      } else {
+        throw new Error("Unable to retrieve payment URL");
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Something went wrong",
+        description: "There was an error on our end. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   return (
     <>
@@ -42,15 +73,15 @@ const DesignPreview = ({ configuration }: { configuration: configuration }) => {
         />
       </div>
 
-      <div className="grid grid-cols-1 text-sm mt-20 sm:grid-cols-12 sm:grid-rows-1 sm:gap-x-6 md:gap-x-8 lg:gap-x-12">
-        <div className="sm:col-span-3 md:col-span-4 md:row-span-2 md:row-end-2">
+      <div className="flex flex-col items-center md:grid text-sm mt-20 sm:grid-cols-12 sm:grid-rows-1 sm:gap-x-6 md:gap-x-8 lg:gap-x-12">
+        <div className="md:col-span-4 lg:col-span-3 md:row-span-2 md:row-end-2">
           <Phone
-            className={cn(`bg-${tw}`)}
+            className={cn(`bg-${tw}`, "max-w-[150px] md:max-w-full")}
             imgSrc={configuration.croppedImageUrl!}
           />
         </div>
 
-        <div className="mt-6 sm:col-span-9 sm:mt-0 md:row-end-1">
+        <div className="mt-6 sm:col-span-9 md:row-end-1">
           <h3 className="text-3xl font-bold tracking-tight text-gray-900">
             Your {modelLabel} Case
           </h3>
@@ -109,19 +140,37 @@ const DesignPreview = ({ configuration }: { configuration: configuration }) => {
                   </div>
                 ) : null}
 
-                <div className="bg-gray-200 h-px my-2"/>
+                <div className="bg-gray-200 h-px my-2" />
 
                 <div className="py-2 flex items-center justify-between">
-                    <p className="font-semibold text-gray-900">Order Total</p>
-                    <p className="font-semibold text-gray-900">{formatPrice(totalPrice/100)}</p>
+                  <p className="font-semibold text-gray-900">Order Total</p>
+                  <p className="font-semibold text-gray-900">
+                    {formatPrice(totalPrice / 100)}
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="flex justify-end mt-8 pb-12">
-                <Button className="px-6 sm:px-8 lg:px-10">
-                        Check out <ArrowRight className="inline ml-1.5 h-4 w-4"/>
-                </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => {}
+                        //createPaymentSession({ configId: configuration.id })
+                      }
+                      className="px-6 sm:px-8 lg:px-10"
+                    >
+                      Check out <ArrowRight className="inline ml-1.5 h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-zinc-800">
+                    <p>
+                      Checkout feature under development. Stay tuned for updates
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </div>
